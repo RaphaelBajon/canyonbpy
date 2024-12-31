@@ -5,6 +5,9 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+with open("requirements.txt") as f:
+    requirements = f.read().splitlines()
+
 setup(
     name="canyonbpy",
     version="0.1.0",
@@ -20,25 +23,7 @@ setup(
         'canyonbpy': ['data/weights/*.txt']
     },
     package_dir={"canyonbpy": "canyonbpy"},
-    install_requires=[
-        'numpy>=1.20.0',
-        'xarray>=0.16.0',
-        'matplotlib>=3.3.0',
-        'PyCO2SYS>=1.8.0',
-        'pandas>=1.2.0',
-        'scipy>=1.6.0',
-    ],
-    extras_require={
-        'dev': [
-            'pytest>=6.0',
-            'pytest-cov>=2.0',
-            'black>=22.0',
-            'flake8>=3.9.0',
-            'mypy>=0.900',
-            'jupyter>=1.0.0',
-        ],
-    },
-    python_requires='>=3.7',
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
