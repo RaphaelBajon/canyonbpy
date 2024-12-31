@@ -67,7 +67,7 @@ jobs:
     - name: Test installation from TestPyPI
       run: |
         python -m pip install --index-url https://test.pypi.org/simple/ --no-deps canyonbpy
-        python -c "from canyonbpy import CANYON_B"
+        python -c "from canyonbpy import canyonb"
 
   deploy-prod:
     name: Deploy to PyPI
