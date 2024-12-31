@@ -48,6 +48,7 @@ jobs:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
         TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
+      continue-on-error: true
       run: |
         # Get current version from pyproject.toml
         VERSION=$(python -c "import tomli; print(tomli.load(open('pyproject.toml', 'rb'))['project']['version'])")
