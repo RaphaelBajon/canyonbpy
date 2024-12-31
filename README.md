@@ -4,9 +4,7 @@ A Python implementation of CANYON-B (CArbonate system and Nutrients concentratio
 
 ## Features
 
-- Convert datetime objects to decimal years for CANYON-B calculations
-- Adjust Arctic latitude calculations
-- Coordinate transformations for CANYON-B neural network predictions
+- Calculate macronutrients and carbonate system variables using CANYON-B neural network 
 
 ## Installation
 

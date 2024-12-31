@@ -1,3 +1,47 @@
 [build-system]
 requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "canyonbpy"
+version = "0.0.0"
+description = "Python implementation of CANYON-B for oceanographic parameter predictions"
+authors = [
+    {name = "Raphaël Bajon", email = "raphael.bajon@ifremer.fr"},
+]
+readme = "README.md"  # This replaces long_description and long_description_content_type
+requires-python = ">=3.7"
+keywords = ["oceanography", "CANYON-B", "neural networks", "carbon", "nutrients"]
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering :: Oceanography",
+]
+dependencies = [
+    "numpy>=1.20.0",
+    "xarray>=0.16.0",
+    "matplotlib>=3.3.0",
+    "PyCO2SYS>=1.8.0",
+    "pandas>=1.2.0",
+    "scipy>=1.6.0",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/RaphaelBajon/canyonbpy"
+"Bug Reports" = "https://github.com/RaphaelBajon/canyonbpy/issues"
+"Source" = "https://github.com/RaphaelBajon/canyonbpy"
+
+[tool.setuptools]
+packages = ["canyonbpy"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+canyonbpy = ["data/weights/*.txt"]
