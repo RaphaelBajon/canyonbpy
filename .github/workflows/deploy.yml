@@ -56,7 +56,6 @@ jobs:
         # Try to install current version from TestPyPI
         if pip install --index-url https://test.pypi.org/simple/ --no-deps canyonbpy==$VERSION 2>/dev/null; then
           echo "Version $VERSION already exists on TestPyPI"
-          exit 1
         else
           echo "Version $VERSION not found on TestPyPI, uploading..."
           python -m twine upload --verbose dist/*
@@ -103,7 +102,6 @@ jobs:
         # Try to install current version from PyPI
         if pip install canyonbpy==$VERSION 2>/dev/null; then
           echo "Version $VERSION already exists on PyPI"
-          exit 1
         else
           echo "Version $VERSION not found on PyPI, uploading..."
           python -m twine upload --verbose dist/*

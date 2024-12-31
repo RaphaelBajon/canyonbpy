@@ -44,4 +44,4 @@ packages = ["canyonbpy"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-canyonbpy = ["data/weights/*.txt"]
+"canyonbpy.data.weights" = ["*.txt"]
