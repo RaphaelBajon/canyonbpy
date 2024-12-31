@@ -25,13 +25,27 @@ jobs:
     - name: Build package
       run: python -m build
 
-    - name: Upload to TestPyPI
+    - name: Check version on TestPyPI and Upload if new
       env:
         TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        TWINE_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
         TWINE_REPOSITORY_URL: https://test.pypi.org/legacy/
       run: |
-        python -m twine upload --verbose dist/*
+        # Get current version
+        VERSION=$(python setup.py --version)
+        echo "Package version: $VERSION"
+        
+        # Try to install current version from TestPyPI
+        if pip install --index-url https://test.pypi.org/simple/ --no-deps canyonbpy==$VERSION 2>/dev/null; then
+          echo "Version $VERSION already exists on TestPyPI"
+          exit 1
+        else
+          echo "Version $VERSION not found on TestPyPI, uploading..."
+          python -m twine upload --verbose dist/*
+        fi
+
+    - name: Wait for TestPyPI to process upload
+      run: sleep 60
 
     - name: Test installation from TestPyPI
       run: |
@@ -59,9 +73,20 @@ jobs:
     - name: Build package
       run: python -m build
 
-    - name: Upload to PyPI
+    - name: Check version on PyPI and Upload if new
       env:
         TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
       run: |
-        python -m twine upload dist/*
+        # Get current version
+        VERSION=$(python setup.py --version)
+        echo "Package version: $VERSION"
+        
+        # Try to install current version from PyPI
+        if pip install canyonbpy==$VERSION 2>/dev/null; then
+          echo "Version $VERSION already exists on PyPI"
+          exit 1
+        else
+          echo "Version $VERSION not found on PyPI, uploading..."
+          python -m twine upload --verbose dist/*
+        fi
