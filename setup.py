@@ -10,7 +10,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="canyonbpy",
-    version="0.1.0",
+    version="0.0.0",
     description="Python implementation of CANYON-B for oceanographic parameter predictions",
     long_description=long_description,
     long_description_content_type="text/markdown",
