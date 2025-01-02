@@ -4,7 +4,6 @@ import xarray as xr
 from datetime import datetime
 from matplotlib.path import Path
 from importlib import resources
-import pkg_resources
 
 
 def calculate_decimal_year(gtime: np.ndarray) -> np.ndarray:
