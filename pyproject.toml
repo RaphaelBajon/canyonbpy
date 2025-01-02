@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "canyonbpy"
-version = "0.0.0"
+version = "0.1.0"
 description = "Python implementation of CANYON-B for oceanographic parameter predictions"
 authors = [
     {name = "Raphaël Bajon", email = "raphael.bajon@ifremer.fr"},
@@ -44,4 +44,4 @@ packages = ["canyonbpy"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-"canyonbpy.data.weights" = ["*.txt"]
+"canyonbpy" = ["data/**/*"]

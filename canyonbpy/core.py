@@ -2,8 +2,7 @@ import numpy as np
 import xarray as xr
 from typing import Union, List, Dict, Optional, Tuple
 import PyCO2SYS as pyco2
-from canyonbpy.data import weights
-import importlib.resources as pkg_resources
+
 
 from .utils import calculate_decimal_year, adjust_arctic_latitude, load_weight_file
 
@@ -21,7 +20,7 @@ def canyonb(
     etemp: Optional[float] = 0.005,
     epsal: Optional[float] = 0.005,
     edoxy: Optional[Union[float, np.ndarray]] = None,
-    weights_dir: str = pkg_resources.files(weights)
+    weights_dir: str = None
 ) -> Dict[str, xr.DataArray]:
     # TODO order='F' should be checked if needed for 2d-4d arrays as inputs
     # Using xarray:

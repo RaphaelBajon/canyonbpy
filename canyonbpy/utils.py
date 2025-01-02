@@ -3,6 +3,8 @@ from typing import Dict, Union
 import xarray as xr
 from datetime import datetime
 from matplotlib.path import Path
+from importlib import resources
+import pkg_resources
 
 
 def calculate_decimal_year(gtime: np.ndarray) -> np.ndarray:
@@ -39,12 +41,33 @@ def adjust_arctic_latitude(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     return adjusted_lat
 
 def load_weight_file(weights_dir: Union[str, None], param_name) -> np.ndarray:
-    """Load neural network weights from file."""
+    """
+    Load neural network weights from file.
+    
+    Args:
+        weights_dir: Optional custom directory path for weights. If None, uses package's data directory
+        param_name: Name of the parameter whose weights to load
+        
+    Returns:
+        np.ndarray: Loaded weights
+    """
     # Implementation
-    if weights_dir is None:
-        weights_dir = "data/weights/"
-    filepath = f"{weights_dir}wgts_{param_name}.txt"
-    return np.loadtxt(filepath)
+    if weights_dir is not None:
+        # If custom directory provided, use it directly
+        filepath = f"{weights_dir}wgts_{param_name}.txt"
+        return np.loadtxt(filepath)
+        # If no custom directory, use package data
+    try:
+        # First attempt: using pkg_resources
+        filepath = pkg_resources.resource_filename('canyonbpy', f'data/weights/wgts_{param_name}.txt')
+        return np.loadtxt(filepath)
+    except Exception:
+        try:
+            # Second attempt: using importlib.resources for text files
+            with resources.open_text('canyonbpy.data.weights', f'wgts_{param_name}.txt') as f:
+                return np.loadtxt(f)
+        except Exception as e:
+            raise FileNotFoundError(f"Could not load weights file for parameter {param_name}. Error: {str(e)}")
 
 def create_output_array(data: np.ndarray, coords: Dict) -> xr.DataArray:
     """Create xarray DataArray with proper coordinates."""
