@@ -57,18 +57,9 @@ def load_weight_file(weights_dir: Union[str, None], param_name) -> np.ndarray:
         filepath = f"{weights_dir}wgts_{param_name}.txt"
         return np.loadtxt(filepath)
         # If no custom directory, use package data
-    try:
-        # First attempt: using pkg_resources
-        filepath = pkg_resources.resource_filename('canyonbpy', f'data/weights/wgts_{param_name}.txt')
-        return np.loadtxt(filepath)
-    except Exception:
-        try:
-            # Second attempt: using importlib.resources for text files
-            with resources.open_text('canyonbpy.data.weights', f'wgts_{param_name}.txt') as f:
-                return np.loadtxt(f)
-        except Exception as e:
-            raise FileNotFoundError(f"Could not load weights file for parameter {param_name}. Error: {str(e)}")
-
+    with resources.open_text('canyonbpy.data.weights', f'wgts_{param_name}.txt') as f:
+            return np.loadtxt(f)
+ 
 def create_output_array(data: np.ndarray, coords: Dict) -> xr.DataArray:
     """Create xarray DataArray with proper coordinates."""
     # Implementation
