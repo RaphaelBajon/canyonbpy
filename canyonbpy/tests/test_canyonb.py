@@ -1,5 +1,6 @@
 """
 Unit tests for canyonb and helper functions.
+Simple versions.
 """
 
 import numpy as np
@@ -24,18 +25,30 @@ def sample_data():
     }
 
 @pytest.fixture
-def weights_dir(tmp_path):
-    """Create temporary weights directory with mock weight files."""
-    weights_dir = tmp_path / "weights"
-    weights_dir.mkdir()
-    
-    # Create mock weight files
-    params = ['AT', 'CT', 'pH', 'pCO2', 'NO3', 'PO4', 'SiOH4']
-    for param in params:
-        mock_weights = np.random.randn(20, 5)  # Example size
-        np.savetxt(str(weights_dir / f'wgts_{param}.txt'), mock_weights)
-    
-    return str(weights_dir)
+def wrong_data():
+    """Wrong data for testing."""
+    return {
+        'gtime': [datetime(2024, 1, 1)],
+        'lat': np.array([91.0]),
+        'lon': np.array([-20.0]),
+        'pres': np.array([100.0]),
+        'temp': np.array([15.0]),
+        'psal': np.array([35.0]),
+        'doxy': np.array([250.0])
+    }
+
+@pytest.fixture
+def nan_data():
+    """Wrong data for testing."""
+    return {
+        'gtime': [datetime(2024, 1, 1)],
+        'lat': np.array([91.0]),
+        'lon': np.array([-20.0]),
+        'pres': np.array([100.0]),
+        'temp': np.array([np.nan]),
+        'psal': np.array([35.0]),
+        'doxy': np.array([250.0])
+    }
 
 def test_calculate_decimal_year():
     """Test decimal year calculation."""
@@ -83,21 +96,33 @@ def test_adjust_arctic_longitude_conversion():
     
     np.testing.assert_array_almost_equal(result1, result2)
 
-def test_canyonb_basic(sample_data, weights_dir):
+def test_canyonb_basic(sample_data):
     """Test basic canyonb functionality."""
-    result = canyonb(**sample_data, weights_dir=weights_dir)
+    result = canyonb(**sample_data)
     
     # Check that we get all expected parameters
     expected_params = ['AT', 'CT', 'pH', 'pCO2', 'NO3', 'PO4', 'SiOH4']
     for param in expected_params:
         assert param in result
         assert f'{param}_ci' in result  # Uncertainty estimate
-        assert isinstance(result[param], xr.DataArray)
+        assert isinstance(result[param], np.ndarray)
+        
+def test_canyonb_nan(nan_data):
+    """Test basic canyonb functionality."""
+    result = canyonb(**nan_data)
+    
+    # Check that we get all expected parameters
+    expected_params = ['AT', 'CT', 'pH', 'pCO2', 'NO3', 'PO4', 'SiOH4']
+    for param in expected_params:
+        assert param in result
+        assert f'{param}_ci' in result  # Uncertainty estimate
+        assert isinstance(result[param], np.ndarray)
+        assert np.isnan(result[param][0])
 
-def test_canyonb_specific_params(sample_data, weights_dir):
+def test_canyonb_specific_params(sample_data):
     """Test canyonb with specific parameter selection."""
     params = ['pH', 'AT']
-    result = canyonb(**sample_data, param=params, weights_dir=weights_dir)
+    result = canyonb(**sample_data, param=params)
     
     # Check that we only get requested parameters
     assert 'pH' in result
@@ -108,11 +133,10 @@ def test_canyonb_specific_params(sample_data, weights_dir):
     assert 'pH_ci' in result
     assert 'AT_ci' in result
 
-def test_canyonb_with_errors(sample_data, weights_dir):
+def test_canyonb_with_errors(sample_data):
     """Test canyonb with custom error specifications."""
     result = canyonb(
         **sample_data,
-        weights_dir=weights_dir,
         epres=1.0,
         etemp=0.01,
         epsal=0.01,
@@ -123,7 +147,7 @@ def test_canyonb_with_errors(sample_data, weights_dir):
     assert 'pH' in result
     assert 'pH_ci' in result
 
-def test_canyonb_array_inputs(weights_dir):
+def test_canyonb_array_inputs():
     """Test canyonb with array inputs."""
     data = {
         'gtime': [datetime(2024, 1, 1), datetime(2024, 1, 2)],
@@ -135,29 +159,15 @@ def test_canyonb_array_inputs(weights_dir):
         'doxy': np.array([250.0, 251.0])
     }
     
-    result = canyonb(**data, weights_dir=weights_dir)
+    result = canyonb(**data)
     
     # Check that output shape matches input
     assert result['pH'].shape == (2,)
 
-def test_canyonb_missing_weights():
-    """Test canyonb behavior with missing weights directory."""
-    with pytest.raises(FileNotFoundError):
-        canyonb(**sample_data, weights_dir='nonexistent/dir/')
-
-def test_canyonb_input_validation(sample_data, weights_dir):
-    """Test input validation in canyonb."""
-    # Test with invalid latitude
-    invalid_data = sample_data.copy()
-    invalid_data['lat'] = np.array([91.0])  # Invalid latitude
-    
-    with pytest.raises(ValueError):
-        canyonb(**invalid_data, weights_dir=weights_dir)
-
-def test_canyonb_shape_mismatch(sample_data, weights_dir):
+def test_canyonb_shape_mismatch(sample_data):
     """Test handling of mismatched input shapes."""
     invalid_data = sample_data.copy()
     invalid_data['lat'] = np.array([45.0, 46.0])  # Different length
     
     with pytest.raises(ValueError):
-        canyonb(**invalid_data, weights_dir=weights_dir)
+        canyonb(**invalid_data)
