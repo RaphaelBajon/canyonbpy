@@ -1,3 +1,4 @@
+```python
 """
 Basic example of using CANYON_B for single point prediction.
 """
@@ -34,3 +35,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+```

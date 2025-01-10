@@ -7,7 +7,15 @@ from importlib import resources
 
 
 def calculate_decimal_year(gtime: np.ndarray) -> np.ndarray:
-    """Convert datetime to decimal year."""
+    """
+    Convert datetime to decimal year. If gtime is already a float, return it as it is, assuming it is in decimal year. 
+
+    Args:
+        gtime: Time to convert to decimal year
+        
+    Returns:
+        np.ndarray: Time converted in decimal year
+    """
     if isinstance(gtime[0], (float, np.float64)):
         # Assuming input is already in decimal years
         return gtime
@@ -19,7 +27,16 @@ def calculate_decimal_year(gtime: np.ndarray) -> np.ndarray:
     return years
 
 def adjust_arctic_latitude(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
-    """Adjust latitude for Arctic basin calculations."""
+    """
+    Adjust latitude for Arctic basin calculations.
+
+    Args:
+        lat: Latitudes to be adjusted
+        lon: Corresponding longitudes 
+        
+    Returns:
+        np.ndarray: Ajusted latitudes 
+    """
     # Points for Arctic basin 'West' of Lomonossov ridge
     plon = np.array([-180, -170, -85, -80, -37, -37, 143, 143, 180, 180, -180, -180])
     plat = np.array([68, 66.5, 66.5, 80, 80, 90, 90, 68, 68, 90, 90, 68])
@@ -39,7 +56,7 @@ def adjust_arctic_latitude(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     
     return adjusted_lat
 
-def load_weight_file(weights_dir: Union[str, None], param_name) -> np.ndarray:
+def load_weight_file(weights_dir: Union[str, None], param_name: str) -> np.ndarray:
     """
     Load neural network weights from file.
     

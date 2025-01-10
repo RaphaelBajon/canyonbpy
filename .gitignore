@@ -30,7 +30,7 @@ test_env/
 env/
 venv/
 ENV/
-
+test-env/
 # IDE
 .idea/
 .vscode/

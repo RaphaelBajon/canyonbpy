@@ -1,6 +1,6 @@
 # CANYON-B Python (canyonbpy)
 
-A Python implementation of CANYON-B (CArbonate system and Nutrients concentration from hYdrological properties and Oxygen using Neural networks) based on Bittig et al. (2018).
+A Python implementation of CANYON-B (CArbonate system and Nutrients concentration from hYdrological properties and Oxygen using Neural networks) based on [Bittig et al., 2018](https://doi.org/10.3389/fmars.2018.00328). It was developped from the MATLAB [CANYON-B v1.0](https://github.com/HCBScienceProducts/CANYON-B).
 
 ## Features
 
@@ -61,7 +61,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Citation
 
-If you use this package in your research, please cite both the original CANYON-B paper and this implementation:
+If you use this package in your research, please cite both the original CANYON-B paper and this implementation for bug tracking:
 
 ```
 @article{bittig2018canyon,
@@ -71,7 +71,8 @@ If you use this package in your research, please cite both the original CANYON-B
   volume={5},
   pages={328},
   year={2018},
-  publisher={Frontiers}
+  publisher={Frontiers}, 
+  doi={10.3389/fmars.2018.00328},
 }
 
 @misc{canyonbpy2024,
@@ -79,6 +80,7 @@ If you use this package in your research, please cite both the original CANYON-B
   title = {canyonbpy: A Python implementation of CANYON-B},
   year = {2024},
   publisher = {GitHub},
-  url = {https://github.com/RaphaelBajon/canyonbpy}
+  url = {https://github.com/RaphaelBajon/canyonbpy},
+  version = {0.2.0},
 }
 ```
