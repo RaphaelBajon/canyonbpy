@@ -38,6 +38,7 @@ dependencies = [
 "Homepage" = "https://github.com/RaphaelBajon/canyonbpy"
 "Bug Reports" = "https://github.com/RaphaelBajon/canyonbpy/issues"
 "Source" = "https://github.com/RaphaelBajon/canyonbpy"
+Documentation = "https://canyonbpy.readthedocs.io"
 
 [tool.setuptools]
 packages = ["canyonbpy"]

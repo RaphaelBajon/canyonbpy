@@ -1,0 +1,79 @@
+site_name: CanyonbPy
+site_description: A Python package for CANYON-B neural network prediction of ocean parameters
+repo_url: https://github.com/raphaelbajon/canyonbpy
+repo_name: raphaelbajon/canyonbpy
+copyright: Copyright &copy; 2025 Raphaël Bajon (MIT License)
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: amber
+      accent: orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: orange
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Noto Sans
+    code: Noto 
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - footnotes
+  - pymdownx.arithmatex:
+      generic: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [.]
+          options:
+            show_source: true
+            show_root_heading: true
+            docstring_style: google
+
+nav:
+  - Home: index.md
+  - About: about.md
+  - Installation: installation.md
+  - User Guide:
+    - Getting Started: user-guide/getting-started.md
+    - Inputs: user-guide/input.md
+    - Advanced Features: user-guide/advanced-features.md
+    - Neural Networks: user-guide/neural-networks.md
+    - Uncertainties: user-guide/uncertainties.md
+  - API Reference:
+    - Core Functions: api/core.md
+    - Utilities: api/utils.md
+  - Examples:
+      - Basic usage: examples/basic-usage.md
+  - Contributing: contributing.md
+  - Version history: version-history.md
