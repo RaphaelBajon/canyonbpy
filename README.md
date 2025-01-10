@@ -1,14 +1,14 @@
-# CANYON-B Python (canyonbpy)
+# CanyonbPy: CANYON-B Python 
 
 A Python implementation of CANYON-B (CArbonate system and Nutrients concentration from hYdrological properties and Oxygen using Neural networks) based on [Bittig et al., 2018](https://doi.org/10.3389/fmars.2018.00328). It was developped from the MATLAB [CANYON-B v1.0](https://github.com/HCBScienceProducts/CANYON-B).
 
 ## Features
 
-- Calculate macronutrients and carbonate system variables using CANYON-B neural network 
+- [x] Calculate macronutrients and carbonate system variables using CANYON-B neural network 
 
 ## Installation
 
-You can install canyonbpy using pip:
+You can install `canyonbpy` using pip:
 
 ```bash
 pip install canyonbpy
@@ -16,7 +16,7 @@ pip install canyonbpy
 
 ## Usage
 
-Here's a simple example of how to use canyonbpy:
+Here's a simple example of how to use `canyonbpy`:
 
 ```python
 from datetime import datetime
@@ -43,13 +43,17 @@ ph_error = results['pH_ci']  # pH uncertainty
 ```
 
 Available parameters for prediction:
-- AT: Total Alkalinity
-- CT: Total Dissolved Inorganic Carbon
-- pH: pH
-- pCO2: Partial pressure of CO2
-- NO3: Nitrate
-- PO4: Phosphate
-- SiOH4: Silicate
+- `AT`: Total Alkalinity
+- `CT`: Total Dissolved Inorganic Carbon
+- `pH`: pH
+- `pCO2`: Partial pressure of CO2
+- `NO3`: Nitrate
+- `PO4`: Phosphate
+- `SiOH4`: Silicate
+
+## Documentation
+
+Documentation is available [here](https://canyonbpy.readthedocs.io/).
 
 ## Contributing
 
@@ -61,9 +65,9 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Citation
 
-If you use this package in your research, please cite both the original CANYON-B paper and this implementation for bug tracking:
+If you use this package in your research, please cite both the original CANYON-B paper and this implementation with the corresponding version for bug tracking:
 
-```
+``` bibtex
 @article{bittig2018canyon,
   title={An alternative to static climatologies: Robust estimation of open ocean CO2 variables and nutrient concentrations from T, S, and O2 data using Bayesian neural networks},
   author={Bittig, Henry C and Steinhoff, Tobias and Claustre, Hervé and Körtzinger, Arne and others},
