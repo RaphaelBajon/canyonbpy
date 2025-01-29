@@ -267,9 +267,7 @@ def canyonb(
             out[f'{paramnames[i]}'] = outcalc['pCO2']
             
             # epCO2 = dpCO2/dDIC * e'DIC'
-            for unc in ['_ci', '_cin', '_cii']:
-                 out[param_name + unc] = outcalc['d_pCO2__d_par2'] * out[param_name + unc] 
-
-            out[param_name + '_cim'] = outcalc['d_pCO2__d_par2'] * np.reshape(out[param_name + '_cim'], shape) 
+            for unc in ['_ci', '_cim', '_cin', '_cii']:
+                out[param_name + unc] = outcalc['d_pCO2__d_par2'] * out[param_name + unc] 
                 
     return out
