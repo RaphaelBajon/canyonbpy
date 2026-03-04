@@ -26,7 +26,7 @@ Native `xarray` support.
 
     ***New features***
 
-    * **`canyonb_from_dataset`** — run CANYON-B directly on an `xr.Dataset`
+    * **`ds.canyonb.predict()`** — run CANYON-B directly on an `xr.Dataset`
       without any manual extraction.  Results are returned as an `xr.Dataset`
       sharing the same dimensions and coordinates as the input, making it
       trivial to merge predictions back into the original dataset.
@@ -37,20 +37,20 @@ Native `xarray` support.
     * Both interfaces support a `var_map` parameter for datasets with
       non-standard variable names (e.g. Argo BGC delayed-mode files using
       `TEMP_ADJUSTED`, `PSAL_ADJUSTED`, …).
-    * Both `canyonb_from_dataset` and `DatasetToNumpy` are now exported from
+    * `DatasetToNumpy` is now exported from
       the top-level `canyonbpy` namespace.
 
     ***Behind the scene***
 
     * New `canyonbpy/preprocessing.py` module implements `DatasetToNumpy`.
-    * `canyonb_from_dataset` lives in `canyonbpy/core.py` alongside `canyonb`.
+    * `canyonb xarray accessor` lives in `canyonbpy/accessor.py`.
     * New test file `canyonbpy/tests/test_xarray.py` covers both interfaces.
 
     ***Documentation***
 
     * Advanced Features page fully rewritten with xarray usage examples,
       including Argo BGC workflows and custom variable name mapping.
-    * API reference updated for `canyonb_from_dataset` and `DatasetToNumpy`.
+    * API reference updated for `DatasetToNumpy`.
 
 ## 0.2
 

@@ -1,6 +1,6 @@
 # Welcome to **CanyonbPy**
 
-**`CanyonbPy`** is a Python package implementing the CANYON-B neural network for predicting ocean parameters. It provides tools for analyzing and predicting various ocean parameters using neural network models.
+**`CanyonbPy`** is a Python package implementing the CANYON-B neural network for predicting ocean nutrients and carbonate system variables, just from temperature, salinity and dissolved oxygen.
 
 !!! info "Matlab version: CANYON-B v1.0"
     
@@ -62,4 +62,21 @@ data = {
 
 # Get predictions
 results = canyonb(**data)
+```
+
+Even easier now:
+
+```python
+import xarray as xr
+import canyonbpy  # accessor ds.canyonb is registered here
+
+# ds must contain: time, latitude, longitude, pressure, temperature, salinity, doxy
+results = ds.canyonb.predict()
+
+# results is an xr.Dataset with the same dims/coords as ds
+print(results["pH"])       # xr.DataArray
+print(results["pH_ci"])    # total uncertainty
+
+# Merge predictions back into the source dataset
+ds_enriched = xr.merge([ds, results])
 ```
