@@ -1,4 +1,6 @@
 # CanyonbPy: CANYON-B Python 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18868524.svg)](https://doi.org/10.5281/zenodo.18868524)
+
 
 A Python implementation of CANYON-B (CArbonate system and Nutrients concentration from hYdrological properties and Oxygen using Neural networks) based on [Bittig et al., 2018](https://doi.org/10.3389/fmars.2018.00328). It was developped from the MATLAB [CANYON-B v1.0](https://github.com/HCBScienceProducts/CANYON-B).
 
@@ -16,7 +18,7 @@ pip install canyonbpy
 
 ## Usage
 
-Here's a simple example of how to use `canyonbpy`:
+Here's a simple example of how to use `canyonbpy` with `numpy`:
 
 ```python
 from datetime import datetime
@@ -41,7 +43,22 @@ results = canyonb(**data)
 ph = results['pH']           # pH prediction
 ph_error = results['pH_ci']  # pH uncertainty
 ```
+And now directly on `xarray`:
 
+```python
+import xarray as xr
+import canyonbpy  # accessor ds.canyonb is registered here
+
+# ds must contain: time, latitude, longitude, pressure, temperature, salinity, doxy
+results = ds.canyonb.predict()
+
+# results is an xr.Dataset with the same dims/coords as ds
+print(results["pH"])       # xr.DataArray
+print(results["pH_ci"])    # total uncertainty
+
+# Merge predictions back into the source dataset
+ds_enriched = xr.merge([ds, results])
+```
 Available parameters for prediction:
 - `AT`: Total Alkalinity
 - `CT`: Total Dissolved Inorganic Carbon
@@ -79,12 +96,11 @@ If you use this package in your research, please cite both the original CANYON-B
   doi={10.3389/fmars.2018.00328},
 }
 
-@misc{canyonbpy2024,
-  author = {Raphaël Bajon},
-  title = {canyonbpy: A Python implementation of CANYON-B},
-  year = {2024},
-  publisher = {GitHub},
-  url = {https://github.com/RaphaelBajon/canyonbpy},
-  version = {0.2.0},
+@software{bajon_canyonbpy,
+  author    = {Bajon, Raphaël},
+  title     = {canyonbpy: A Python implementation of CANYON-B},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.18868524},
+  url       = {https://doi.org/10.5281/zenodo.18868524}
 }
 ```
