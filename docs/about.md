@@ -32,8 +32,8 @@ If you use `canyonbpy` in your research, please cite both the original CANYON-B 
   author    = {Bajon, Raphaël},
   title     = {canyonbpy: A Python implementation of CANYON-B},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.XXXXXXX},
-  url       = {https://doi.org/10.5281/zenodo.XXXXXXX}
+  doi       = {10.5281/zenodo.18868524},
+  url       = {https://doi.org/10.5281/zenodo.18868524}
 }
 ```
 
@@ -49,6 +49,6 @@ If you use `canyonbpy` in your research, please cite both the original CANYON-B 
       title     = {canyonbpy: A Python implementation of CANYON-B},
       version   = {0.3.0},
       publisher = {Zenodo},
-      doi       = {10.5281/zenodo.XXXXXXX}
+      doi       = {10.5281/zenodo.18868524}
     }
     ```
