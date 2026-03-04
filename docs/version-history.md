@@ -16,30 +16,41 @@
 
     The structure of the underlying modules and their functions is not yet totally stable and, for now, may change in any version increment. Such changes will be described in the release notes below.
 
-<!---
-!!! new-version "Changes in v0.1.1"
+## 0.3
 
-    ***Breaking changes***
+Native `xarray` support.
 
-    ***Behind the scene***
+### 0.3.0 (2 March 2026)
+
+!!! new-version "Changes in v0.3.0"
 
     ***New features***
 
-    * 
+    * **`canyonb_from_dataset`** — run CANYON-B directly on an `xr.Dataset`
+      without any manual extraction.  Results are returned as an `xr.Dataset`
+      sharing the same dimensions and coordinates as the input, making it
+      trivial to merge predictions back into the original dataset.
+    * **`DatasetToNumpy`** — low-level helper class that maps `canyonb`
+      argument names to dataset variables (with a customisable `var_map`)
+      and converts them to flat numpy arrays.  Useful when you need to
+      inspect or pre-process inputs before running the neural network.
+    * Both interfaces support a `var_map` parameter for datasets with
+      non-standard variable names (e.g. Argo BGC delayed-mode files using
+      `TEMP_ADJUSTED`, `PSAL_ADJUSTED`, …).
+    * Both `canyonb_from_dataset` and `DatasetToNumpy` are now exported from
+      the top-level `canyonbpy` namespace.
 
-    ***Default options***
+    ***Behind the scene***
 
-    * 
+    * New `canyonbpy/preprocessing.py` module implements `DatasetToNumpy`.
+    * `canyonb_from_dataset` lives in `canyonbpy/core.py` alongside `canyonb`.
+    * New test file `canyonbpy/tests/test_xarray.py` covers both interfaces.
 
-    ***Bug fixes***
-    
-    * 
+    ***Documentation***
 
-    ***Technical***
-
-    * Updated from building with setup.py to pyproject.toml.
-    * canyonbpy can now be installed with conda/mamba (via conda-forge).
--->
+    * Advanced Features page fully rewritten with xarray usage examples,
+      including Argo BGC workflows and custom variable name mapping.
+    * API reference updated for `canyonb_from_dataset` and `DatasetToNumpy`.
 
 ## 0.2
 
@@ -84,4 +95,4 @@ Deployment of `canyonbpy` on PyPi! An as-close-as-possible clone of [MATLAB CANY
 
     ***New features***
     
-    * `canyonb` is available on python! 
+    * `canyonb` is available on python!
