@@ -34,6 +34,20 @@ ph = results['pH']
 ph_uncertainty = results['pH_ci']
 ```
 
+Or using the built-in accessor:
+
+```python
+import xarray as xr
+import canyonbpy  # accessor ds.canyonb is registered here
+
+# ds must contain: time, latitude, longitude, pressure, temperature, salinity, doxy
+results = ds.canyonb.predict()
+
+# And access the same specific parameters
+ph = results['pH']
+ph_uncertainty = results['pH_ci']
+```
+
 ## Understanding the Output
 
 **`canyonb`** can predict the following parameters:
