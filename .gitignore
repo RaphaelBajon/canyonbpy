@@ -20,8 +20,14 @@ wheels/
 .installed.cfg
 *.egg
 
+# Jupyter Notebook
+*.ipynb
+
 # chut
 .secrets
+
+# site
+site/
 
 # Virtual environments
 test_env/

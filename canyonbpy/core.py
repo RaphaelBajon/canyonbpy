@@ -22,10 +22,6 @@ def canyonb(
     edoxy: Optional[Union[float, np.ndarray]] = None,
     weights_dir: str = None
 ) -> Dict[str, xr.DataArray]:
-    # TODO order='F' should be checked if needed for 2d-4d arrays as inputs
-    # Using xarray:
-    # For now 2d-matrix not handle because we are creating xarray matrix at the end with multiple dimension wihtout multiple dimensions names. Should address this issue.
-    # This might be needed but not sure since all reshape, flatten and eisum are order='C'(or 'K') for indexing right now. 
     """
     CANYON-B neural network prediction for ocean parameters.
     
@@ -47,8 +43,12 @@ def canyonb(
         Dissolved oxygen (µmol/kg)
     param : list of str, optional
         Parameters to calculate. Default calculates all.
-    epres, etemp, epsal : float, optional
-        Input errors
+    epres : float, optional
+        Pressure input error in dbar (default 0.5).
+    etemp : float, optional
+        Temperature input error in °C (default 0.005).
+    epsal : float, optional
+        Salinity input error (default 0.005).
     edoxy : float or array-like, optional
         Oxygen input error (default: 1% of doxy)
     weights_dir : str

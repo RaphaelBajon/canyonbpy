@@ -6,7 +6,7 @@ A Python implementation of CANYON-B (CArbonate system and Nutrients concentratio
 
 ## Features
 
-- [x] Calculate macronutrients and carbonate system variables using CANYON-B neural network 
+Calculate macronutrients and carbonate system variables using CANYON-B neural network. 
 
 ## Installation
 
@@ -43,14 +43,33 @@ results = canyonb(**data)
 ph = results['pH']           # pH prediction
 ph_error = results['pH_ci']  # pH uncertainty
 ```
-And now directly on `xarray`:
+And now directly with `xarray`:
 
 ```python
 import xarray as xr
 import canyonbpy  # accessor ds.canyonb is registered here
 
 # ds must contain: time, latitude, longitude, pressure, temperature, salinity, doxy
+ds = xr.Dataset(
+    {
+        "temperature": (("time", "pressure", "latitude", "longitude"), 16.0 * np.ones((2, 3, 3, 4))), 
+        "salinity": (("time", "pressure", "latitude", "longitude"), 36.1 * np.ones((2, 3, 3, 4))),
+        "doxy": (("time", "pressure", "latitude", "longitude"), 104 * np.ones((2, 3, 3, 4))),
+    },
+    coords={
+        "time": ("time", [datetime(2014, 12, 9, 8, 45), datetime(2020, 12, 10, 8, 45)]),
+        "pressure": ("pressure", np.array([180, 181, 182])),
+        "latitude": ("latitude", np.array([17.6, 17.6, 17.6])),
+        "longitude": ("longitude", np.array([-24.3, -24.3, -24.3, -24.3])),
+    },
+)
+
+# Predict with CANYON-B
 results = ds.canyonb.predict()
+
+# CONTENT
+results_content = ds.canyonb.content()
+
 
 # results is an xr.Dataset with the same dims/coords as ds
 print(results["pH"])       # xr.DataArray
