@@ -99,37 +99,58 @@ def _extract_jacobians(
     temp: np.ndarray,
     psal: np.ndarray,
     doxy: np.ndarray,
+    base_vals: Dict[str, np.ndarray],
 ) -> Dict[str, np.ndarray]:
-    """Return d(var)/d(input_k) for each carbonate variable via unit-error runs.
+    """Return SIGNED d(var)/d(input_k) via forward finite differences.
 
-    ``canyonbpy`` computes ``{var}_cii = sqrt( Σ_k (∂var/∂x_k · e_k)² )``.
-    Setting ``e_k = 1`` for one input at a time (all others 0) therefore gives
-    ``{var}_cii = |∂var/∂x_k|`` for that input, exactly matching the ``inx``
-    Jacobian computed internally in ``core.py``.
+    MATLAB's ``CANYONB_private.m`` stores ``out.inx`` as SIGNED neural-network
+    derivatives (the chain-rule product of weight matrices and sech² activations),
+    which are then used directly in ``CO2CONTENT.m`` to build the off-diagonal
+    cross-covariance matrix::
+
+        cycov(i,j) = Σ_k inx_i[k] * inx_j[k] * e_k²
+
+    The previous unit-error trick recovered ``_cii = sqrt(Σ inx² e²)``, which
+    always gives ``|inx|``, losing the sign.  Forward finite differences recover
+    the same signed derivatives without any modification of ``core.py``.  Four
+    additional ``canyonb`` calls are needed (same as before); the pre-computed
+    *base_vals* replace what would have been a redundant fifth call.
+
+    Parameters
+    ----------
+    base_vals : dict
+        Pre-computed central-point CANYON-B values ``{param: (N,) array}``
+        obtained from the main ``canyonb`` call.
 
     Returns
     -------
     jacs : dict
         Keys are variable names in ``PARAMS``.
-        Values are ``(N, 4)`` arrays of partial derivatives
+        Values are ``(N, 4)`` arrays of **SIGNED** partial derivatives
         ordered as ``[∂var/∂temp, ∂var/∂psal, ∂var/∂doxy, ∂var/∂pres]``.
     """
-    base = dict(
-        gtime=gtime, lat=lat, lon=lon, pres=pres,
-        temp=temp, psal=psal, doxy=doxy,
-        param=PARAMS,
-    )
-    jacs: Dict[str, np.ndarray] = {v: np.zeros((len(pres), 4)) for v in PARAMS}
+    N = len(pres)
+    jacs: Dict[str, np.ndarray] = {v: np.zeros((N, 4)) for v in PARAMS}
 
-    for k, single_error_kwargs in enumerate([
-        dict(epres=0.0, etemp=1.0, epsal=0.0, edoxy=0.0),   # → ∂var/∂temp
-        dict(epres=0.0, etemp=0.0, epsal=1.0, edoxy=0.0),   # → ∂var/∂psal
-        dict(epres=0.0, etemp=0.0, epsal=0.0, edoxy=1.0),   # → ∂var/∂doxy
-        dict(epres=1.0, etemp=0.0, epsal=0.0, edoxy=0.0),   # → ∂var/∂pres
-    ]):
-        r = _canyonb(**base, **single_error_kwargs)
+    # Step sizes: large enough to avoid floating-point noise while staying in
+    # the linear regime of the smooth neural-network outputs.
+    _PERTURBATIONS = [
+        ("temp", 1e-3, temp + 1e-3),
+        ("psal", 1e-3, psal + 1e-3),
+        ("doxy", 0.1,  doxy + 0.1),
+        ("pres", 0.1,  pres + 0.1),
+    ]
+
+    common = dict(
+        gtime=gtime, lat=lat, lon=lon,
+        temp=temp, psal=psal, doxy=doxy, pres=pres,
+        param=PARAMS, epres=0., etemp=0., epsal=0., edoxy=0.,
+    )
+
+    for k, (input_name, delta, val_plus) in enumerate(_PERTURBATIONS):
+        r = _canyonb(**{**common, input_name: val_plus})
         for v in PARAMS:
-            jacs[v][:, k] = np.asarray(r[f"{v}_cii"]).ravel()
+            jacs[v][:, k] = (np.asarray(r[v]).ravel() - base_vals[v]) / delta
 
     return jacs
 
@@ -213,51 +234,46 @@ def co2content(
 
     Returns
     -------
-    dict with keys:
+    dict
+        Dictionary with the following keys:
 
-    ``AT``, ``CT``, ``pH``, ``pCO2``
-        Weighted-mean CONTENT estimates, shape ``(N,)``.
-    ``AT_sigma``, ``CT_sigma``, ``pH_sigma``, ``pCO2_sigma``
-        Total uncertainty (empirical spread + propagated input covariance),
-        shape ``(N,)``.
-    ``AT_sigma_min``, ``CT_sigma_min``, ``pH_sigma_min``, ``pCO2_sigma_min``
-        Minimum propagated uncertainty (correlated-input component only),
-        shape ``(N,)``.
-    ``AT_raw``, ``CT_raw``, ``pH_raw``, ``pCO2_raw``
-        All four raw estimates: column 0 = CANYON-B direct, columns 1–3 from
-        CO2SYS combinations. Shape ``(N, 4)``.
-    ``canyon`` : dict
-        Full CANYON-B output for AT, CT, pH, pCO2, SiOH4, and PO4, including
-        all ``_ci``, ``_cim``, ``_cin``, and ``_cii`` uncertainty components.
+        - **AT**, **CT**, **pH**, **pCO2** — weighted-mean CONTENT estimates.
+        - **AT_sigma**, **CT_sigma**, **pH_sigma**, **pCO2_sigma** — total
+          uncertainty (empirical spread + propagated input covariance).
+        - **AT_sigma_min**, **CT_sigma_min**, **pH_sigma_min**,
+          **pCO2_sigma_min** — minimum propagated uncertainty
+          (correlated-input component only).
+        - **AT_raw**, **CT_raw**, **pH_raw**, **pCO2_raw** — all four raw
+          estimates: index 0 = CANYON-B direct, indices 1–3 from CO2SYS
+          combinations, shape ``(N, 4)``.
+        - **canyon** — full CANYON-B output for AT, CT, pH, pCO2, SiOH4,
+          and PO4, including all ``_ci``, ``_cim``, ``_cin``, and ``_cii``
+          uncertainty components.
 
     Notes
     -----
-    The CANYON-B ``_cii`` component encodes input-propagated uncertainty::
-
-        _cii = sqrt( Σ_k (∂var/∂x_k · e_k)² )
-
-    Running ``canyonb`` with ``e_k = 1`` for a single input at a time allows
-    exact recovery of the per-input Jacobians ``∂var/∂x_k``, which are used
-    to build the full cross-variable covariance matrix without modifying the
-    ``canyonb`` source code.
+    The cross-variable covariance matrix ``cycov`` is built from SIGNED
+    Jacobians ``∂var/∂x_k`` recovered via forward finite differences, matching
+    the ``inx`` arrays computed inside ``CANYONB_private.m``.  This preserves
+    the correct sign of cross-covariance terms (e.g., AT and pH can have
+    opposing sensitivity to temperature, giving a negative covariance) that
+    was lost in the previous unit-error approach.
 
     Check values (Bittig et al. 2018, from ``CO2CONTENT.m`` header)
     ---------------------------------------------------------------
     Input: 09-Dec-2014 08:45 UTC · 17.6 °N · −24.3 °E · 180 dbar ·
            16 °C · 36.1 PSU · 104 µmol O₂ kg⁻¹ (default input errors)
 
-    +--------+----------+---------+-----------+----------+
-    | var    | estimate | sigma   | sigma_min | unit     |
-    +========+==========+=========+===========+==========+
-    | AT     | 2357.817 |  10.215 |     7.464 | µmol/kg  |
-    | CT     | 2199.472 |   9.811 |     7.281 | µmol/kg  |
-    | pH     | 7.870137 | 0.02137 |   0.01677 |          |
-    | pCO2   |  639.848 |  34.108 |    26.814 | µatm     |
-    +--------+----------+---------+-----------+----------+
+    | var  | estimate | sigma   | sigma_min | unit    |
+    |------|----------|---------|-----------|---------|
+    | AT   | 2357.817 | 10.215  | 7.464     | µmol/kg |
+    | CT   | 2199.472 | 9.811   | 7.281     | µmol/kg |
+    | pH   | 7.870137 | 0.02137 | 0.01677   |         |
+    | pCO2 | 639.848  | 34.108  | 26.814    | µatm    |
 
-    Central values match to < 0.05 %. Sigma values differ slightly from the
-    Matlab reference because the internal ``CANYONB_private`` cross-network
-    covariances are not exposed by ``canyonb``.
+    Central values match to < 0.05 %. Sigma values are computed from SIGNED
+    Jacobians via finite differences, matching the ``inx`` arrays used in
+    ``CANYONB_private.m``.
 
     Examples
     --------
@@ -325,7 +341,7 @@ def co2content(
     #
     #     Inputs x_k ∈ {temp, psal, doxy, pres};  y_i, y_j ∈ PARAMS.
     # ------------------------------------------------------------------
-    jacs = _extract_jacobians(gtime, lat, lon, pres, temp, psal, doxy)
+    jacs = _extract_jacobians(gtime, lat, lon, pres, temp, psal, doxy, cy_val)
     # jacs[v]: (N, 4) — columns [∂v/∂temp, ∂v/∂psal, ∂v/∂doxy, ∂v/∂pres]
 
     e_sq = np.stack([etemp_arr, epsal_arr, edoxy, epres_arr], axis=1) ** 2  # (N, 4)
@@ -347,10 +363,13 @@ def co2content(
     # ------------------------------------------------------------------
     raw   = {v: np.full((nol, 4), np.nan) for v in PARAMS}
     sigma = {v: np.full((nol, 4), np.nan) for v in PARAMS}
+    # grads[v][:, col, j] = d(estimate_col_of_v) / d(PARAMS[j])
+    grads = {v: np.zeros((nol, 4, 4)) for v in PARAMS}
 
-    for v in PARAMS:
+    for k_idx, v in enumerate(PARAMS):
         raw[v][:, 0]   = cy_val[v]
         sigma[v][:, 0] = cy_ci[v]
+        grads[v][:, 0, k_idx] = 1.0
 
     # Store PyCO2SYS gradients for later covariance calculation
     dc: Dict[int, Dict] = {}
@@ -393,6 +412,8 @@ def co2content(
                 + 2.0 * g1 * g2 * cycov[i1, i2]
             )
             sigma[ov_name][:, col] = np.sqrt(np.maximum(var_prop, 0.0))
+            grads[ov_name][:, col, i1] = g1
+            grads[ov_name][:, col, i2] = g2
 
     # ------------------------------------------------------------------
     # 6.  Per-variable 4×4 covariance matrix, weighted mean, and sigmas
@@ -405,21 +426,15 @@ def co2content(
         for col in range(4):
             cocov_k[col, col] = sigma[k][:, col] ** 2
 
-        # Off-diagonal: cov(direct_k, CO2SYS_indirect_k from combo p)
-        #             = g1 · cov(k, v1) + g2 · cov(k, v2)
-        for p, (ip1, ip2) in enumerate(_INPAR):
-            i1, i2 = ip1 - 1, ip2 - 1
-            for ki, ov_name in enumerate(
-                (PARAMS[_OUTPAR[p][0] - 1], PARAMS[_OUTPAR[p][1] - 1])
-            ):
-                if ov_name != k:
-                    continue
-                col_ov = _COL[p][ki]
-                g1 = dc[p][(ov_name, "g1")]
-                g2 = dc[p][(ov_name, "g2")]
-                cov_0_col = g1 * cycov[k_idx, i1] + g2 * cycov[k_idx, i2]
-                cocov_k[0, col_ov] = cov_0_col
-                cocov_k[col_ov, 0] = cov_0_col
+        # Off-diagonal: first-order covariance for every estimate pair
+        # cov(a,b) = grad_a^T * Cov(PARAMS) * grad_b
+        for a in range(4):
+            for b in range(a + 1, 4):
+                ga = grads[k][:, a, :]
+                gb = grads[k][:, b, :]
+                cov_ab = np.einsum("ni,ijn,nj->n", ga, cycov, gb)
+                cocov_k[a, b] = cov_ab
+                cocov_k[b, a] = cov_ab
 
         # Weights = 1 / σ²  (zero sigma → zero weight)
         w = np.where(sigma[k] > 0, 1.0 / np.maximum(sigma[k] ** 2, 1e-30), 0.0)

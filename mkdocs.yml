@@ -58,7 +58,7 @@ plugins:
           options:
             show_source: true
             show_root_heading: true
-            docstring_style: google
+            docstring_style: numpy
 
 nav:
   - Home: index.md
@@ -72,6 +72,8 @@ nav:
     - Uncertainties: user-guide/uncertainties.md
   - API Reference:
     - Core Functions: api/core.md
+    - xarray Accessor: api/accessor.md
+    - Preprocessing: api/preprocessing.md
     - Utilities: api/utils.md
   - Examples:
       - Basic usage: examples/basic-usage.md

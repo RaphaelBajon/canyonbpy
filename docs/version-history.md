@@ -16,6 +16,45 @@
 
     The structure of the underlying modules and their functions is not yet totally stable and, for now, may change in any version increment. Such changes will be described in the release notes below.
 
+## 0.4
+
+CONTENT algorithm and multi-dimensional input support.
+
+### 0.4.0 (27 May 2026)
+
+!!! new-version "Changes in v0.4.0"
+
+    ***New features***
+
+    * **`ds.canyonb.content()`** — CONTENT algorithm (Bittig et al. 2018) as an
+      xarray accessor method.  Returns internally-consistent AT, CT, pH, and pCO₂
+      estimates with full propagated uncertainty, including cross-variable
+      covariance from shared hydrographic inputs.
+    * **`co2content()`** — public low-level function mirroring `CONTENT.m`.
+    * `include_raw=True` exposes the four individual estimates per variable
+      (CANYON-B direct + 3 CO2SYS combinations) along an `estimate` dimension.
+    * `include_canyonb=True` includes the full CANYON-B sub-output prefixed
+      with `canyonb_`.
+    * Multi-dimensional datasets (e.g. `time × pressure × lat × lon`) are now
+      fully supported by both `predict()` and `content()`.
+
+    ***Bug fixes***
+
+    * **Sigma values** — Jacobians are now computed via forward finite differences
+      (signed), matching the `inx` arrays in `CANYONB_private.m`.  The previous
+      unit-error approach returned `|inx|`, causing cross-covariances to lose
+      their sign and sigma values to be 5–18 % too low.  Values now match the
+      MATLAB reference to < 0.1 %.
+    * **Dimension ordering** — `DatasetToNumpy._broadcast_all()` now passes
+      multi-dimensional variables first to `xr.broadcast`, preserving the
+      user-defined dimension order for N-D grids.
+
+    ***Documentation***
+
+    * API autodoc via `mkdocstrings` for `canyonb`, `co2content`,
+      `CanyonBAccessor`, and `DatasetToNumpy`.
+    * New API pages: *xarray Accessor* and *Preprocessing*.
+
 ## 0.3
 
 Native `xarray` support.

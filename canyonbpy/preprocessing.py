@@ -82,6 +82,10 @@ class DatasetToNumpy:
     def to_dict(self) -> Dict[str, np.ndarray]:
         """Return a dictionary of flat numpy arrays ready for :func:`canyonb`.
 
+        All input variables are broadcast to their common shape before
+        flattening.  This means a 1-D pressure coordinate is automatically
+        tiled over a ``(time, pressure)`` grid, for example.
+
         Returns
         -------
         dict
@@ -92,13 +96,17 @@ class DatasetToNumpy:
         KeyError
             If a required variable is absent from the dataset.
         """
+        broadcast = self._broadcast_all()
         out: Dict[str, np.ndarray] = {}
-        for canyon_key, ds_name in self._var_map.items():
-            out[canyon_key] = self._extract(ds_name, canyon_key)
+        for canyon_key, da in broadcast.items():
+            if canyon_key == "gtime":
+                out[canyon_key] = self._convert_time(da)
+            else:
+                out[canyon_key] = da.values.flatten()
         return out
 
     def original_shape(self) -> Tuple[int, ...]:
-        """Return the shape of the pressure field before flattening.
+        """Return the common broadcast shape of all input fields.
 
         Useful to reshape canyonb outputs back to the original grid.
 
@@ -106,12 +114,36 @@ class DatasetToNumpy:
         -------
         tuple of int
         """
-        ref_name = self._var_map["pres"]
-        return self._get_variable(ref_name).shape
+        broadcast = self._broadcast_all()
+        return next(iter(broadcast.values())).shape
+
+    def original_dims(self) -> Tuple[str, ...]:
+        """Return the dimension names of the common broadcast shape.
+
+        Returns
+        -------
+        tuple of str
+        """
+        broadcast = self._broadcast_all()
+        return next(iter(broadcast.values())).dims
 
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
+
+    def _broadcast_all(self) -> Dict[str, xr.DataArray]:
+        """Broadcast every input variable to the common grid shape.
+
+        Multi-dimensional arrays are passed to ``xr.broadcast`` first so their
+        dimension order is used as the canonical order for the result.
+        """
+        das = {k: self._get_variable(v) for k, v in self._var_map.items()}
+        # Sort by ndim descending so that the variable with the most dimensions
+        # anchors the broadcast dimension order.
+        ordered = sorted(das.items(), key=lambda kv: -kv[1].ndim)
+        broadcast_vals = xr.broadcast(*[da for _, da in ordered])
+        broadcast_map = dict(zip([k for k, _ in ordered], broadcast_vals))
+        return {k: broadcast_map[k] for k in das}
 
     def _get_variable(self, name: str) -> xr.DataArray:
         if name in self.dataset:
@@ -124,7 +156,7 @@ class DatasetToNumpy:
             f"coordinates: {list(self.dataset.coords)}."
         )
 
-    def _extract(self, ds_name: str, canyon_key: str) -> np.ndarray:
+    def _extract(self, ds_name: str, canyon_key: str) -> np.ndarray:  # kept for back-compat
         da = self._get_variable(ds_name)
         if canyon_key == "gtime":
             return self._convert_time(da)

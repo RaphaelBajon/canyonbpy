@@ -73,6 +73,9 @@ import canyonbpy  # accessor ds.canyonb is registered here
 # ds must contain: time, latitude, longitude, pressure, temperature, salinity, doxy
 results = ds.canyonb.predict()
 
+# CONTENT
+results_content = ds.canyonb.content()
+
 # results is an xr.Dataset with the same dims/coords as ds
 print(results["pH"])       # xr.DataArray
 print(results["pH_ci"])    # total uncertainty

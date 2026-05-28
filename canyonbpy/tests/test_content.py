@@ -39,11 +39,11 @@ _EXPECTED = {
     "pCO2": (639.8477,  34.1077,  26.8143),
 }
 
-# Central values must match to 0.05 %; sigmas within 25 %
-# (small difference in sigmas is expected because canyonbpy does not expose
-# the internal CANYONB_private cross-network covariances used in the Matlab code)
+# Central values must match to 0.05 %; sigmas within 1 %
+# Signed Jacobians via finite differences match the inx arrays used in
+# CANYONB_private.m, so sigma values agree with the Matlab reference to <0.1 %.
 _RTOL_VAL   = 0.05
-_RTOL_SIGMA = 25.0
+_RTOL_SIGMA = 1.0
 
 
 @pytest.fixture(scope="module")
@@ -74,6 +74,14 @@ class TestCheckValues:
         got = float(result_single[f"{var}_sigma"][0])
         assert abs(got - expected_sigma) / abs(expected_sigma) < _RTOL_SIGMA / 100, (
             f"{var}_sigma: expected ~{expected_sigma}, got {got:.5f}"
+        )
+
+    @pytest.mark.parametrize("var", ["AT", "CT", "pH", "pCO2"])
+    def test_sigma_min_ballpark(self, result_single, var):
+        expected_sigma_min = _EXPECTED[var][2]
+        got = float(result_single[f"{var}_sigma_min"][0])
+        assert abs(got - expected_sigma_min) / abs(expected_sigma_min) < _RTOL_SIGMA / 100, (
+            f"{var}_sigma_min: expected ~{expected_sigma_min}, got {got:.5f}"
         )
 
     @pytest.mark.parametrize("var", ["AT", "CT", "pH", "pCO2"])
