@@ -70,7 +70,6 @@ results = ds.canyonb.predict()
 # CONTENT
 results_content = ds.canyonb.content()
 
-
 # results is an xr.Dataset with the same dims/coords as ds
 print(results["pH"])       # xr.DataArray
 print(results["pH_ci"])    # total uncertainty
@@ -101,7 +100,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Citation
 
-If you use this package in your research, please cite both the original CANYON-B paper and this implementation with the corresponding version for bug tracking:
+If you use this package in your research, please cite both the original CANYON-B paper and this implementation with the corresponding version for bug tracking (the example here shows all versions):
 
 ``` bibtex
 @article{bittig2018canyon,
@@ -119,7 +118,7 @@ If you use this package in your research, please cite both the original CANYON-B
   author    = {Bajon, Raphaël},
   title     = {canyonbpy: A Python implementation of CANYON-B},
   publisher = {Zenodo},
-  doi       = {10.5281/zenodo.18868524},
-  url       = {https://doi.org/10.5281/zenodo.18868524}
+  doi       = {10.5281/zenodo.14765787},
+  url       = {https://doi.org/10.5281/zenodo.14765787}
 }
 ```
