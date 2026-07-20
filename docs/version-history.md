@@ -16,6 +16,34 @@
 
     The structure of the underlying modules and their functions is not yet totally stable and, for now, may change in any version increment. Such changes will be described in the release notes below.
 
+## Unreleased
+
+!!! new-version "Changes since v0.4.0"
+
+    ***Bug fixes***
+
+    * **`calculate_decimal_year`** — the fractional part of the decimal year
+      was always divided by 366 days, over-estimating the elapsed fraction
+      of any non-leap year by up to ~1 day near year-end. It now divides by
+      the true length of each calendar year (365 or 366 days).
+    * **`calculate_decimal_year`** — passing a `numpy.datetime64` array
+      (e.g. `ds["time"].values` from an `xarray` coordinate) or a plain
+      integer-dtype array of decimal years previously raised
+      `AttributeError`. Both are now supported, alongside pandas
+      `Timestamp` arrays and ISO date/time strings.
+    * **`load_weight_file`** — a custom `weights_dir` without a trailing
+      path separator produced a malformed path (e.g. `"/my/dirwgts_AT.txt"`).
+      Paths are now joined with `os.path.join`, so both
+      `"/my/dir"` and `"/my/dir/"` work.
+
+    ***Documentation***
+
+    * `canyonb`'s return type was documented (and type-hinted) as
+      `Dict[str, xr.DataArray]`; it has always returned plain
+      `Dict[str, np.ndarray]`. Docstring and type hints corrected.
+    * [Input Data](../user-guide/input.md) now documents all accepted time
+      formats, including `datetime64`/`Timestamp` arrays and date strings.
+
 ## 0.4
 
 CONTENT algorithm and multi-dimensional input support.

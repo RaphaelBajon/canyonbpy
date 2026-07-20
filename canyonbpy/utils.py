@@ -1,30 +1,53 @@
+import calendar
+import os
 import numpy as np
+import pandas as pd
 from typing import Dict, Union
 import xarray as xr
-from datetime import datetime
 from matplotlib.path import Path
 from importlib import resources
 
 
 def calculate_decimal_year(gtime: np.ndarray) -> np.ndarray:
     """
-    Convert datetime to decimal year. If gtime is already a float, return it as it is, assuming it is in decimal year. 
+    Convert datetime-like values to decimal year.
+
+    Accepts Python ``datetime`` objects, ``numpy.datetime64`` /
+    pandas ``Timestamp`` values, date strings, or an array already in
+    decimal-year form (in which case it is returned unchanged, cast to
+    float).
+
+    Each year is divided by its true length (365 or 366 days) so that,
+    unlike a fixed 366-day divisor, the fractional part correctly reaches
+    1.0 at the end of both leap and non-leap years.
 
     Args:
         gtime: Time to convert to decimal year
-        
+
     Returns:
-        np.ndarray: Time converted in decimal year
+        np.ndarray: Time converted to decimal year, same shape as ``gtime``
     """
-    if isinstance(gtime[0], (float, np.float64)):
+    arr = np.asarray(gtime)
+
+    if np.issubdtype(arr.dtype, np.floating) or np.issubdtype(arr.dtype, np.integer):
         # Assuming input is already in decimal years
-        return gtime
-    
-    years = np.array([d.year + (d.dayofyear - 1 + d.hour/24 + d.minute/1440) / 366 
-                      if hasattr(d, 'dayofyear') 
-                      else d.year + (d - datetime(d.year, 1, 1)).total_seconds()/(366*86400)
-                      for d in gtime])
-    return years
+        return arr.astype(float)
+
+    shape = arr.shape
+    timestamps = pd.to_datetime(arr.ravel())
+
+    year = timestamps.year.to_numpy()
+    days_in_year = np.where([calendar.isleap(y) for y in year], 366, 365)
+    seconds_into_year = (
+        (timestamps.dayofyear.to_numpy() - 1) * 86400
+        + timestamps.hour.to_numpy() * 3600
+        + timestamps.minute.to_numpy() * 60
+        + timestamps.second.to_numpy()
+        + timestamps.microsecond.to_numpy() / 1e6
+    )
+
+    decimal_year = year + seconds_into_year / (days_in_year * 86400)
+    return decimal_year.reshape(shape)
 
 def adjust_arctic_latitude(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
     """
@@ -59,23 +82,22 @@ def adjust_arctic_latitude(lat: np.ndarray, lon: np.ndarray) -> np.ndarray:
 def load_weight_file(weights_dir: Union[str, None], param_name: str) -> np.ndarray:
     """
     Load neural network weights from file.
-    
+
     Args:
         weights_dir: Optional custom directory path for weights. If None, uses package's data directory
         param_name: Name of the parameter whose weights to load
-        
+
     Returns:
         np.ndarray: Loaded weights
     """
-    # Implementation
     if weights_dir is not None:
-        # If custom directory provided, use it directly
-        filepath = f"{weights_dir}wgts_{param_name}.txt"
+        # If custom directory provided, use it directly (with or without trailing separator)
+        filepath = os.path.join(weights_dir, f"wgts_{param_name}.txt")
         return np.loadtxt(filepath)
-        # If no custom directory, use package data
+    # If no custom directory, use package data
     with resources.open_text('canyonbpy.data.weights', f'wgts_{param_name}.txt') as f:
-            return np.loadtxt(f)
- 
+        return np.loadtxt(f)
+
 def create_output_array(data: np.ndarray, coords: Dict) -> xr.DataArray:
     """Create xarray DataArray with proper coordinates."""
     # Implementation

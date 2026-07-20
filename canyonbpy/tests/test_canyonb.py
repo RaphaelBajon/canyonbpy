@@ -100,6 +100,52 @@ def test_calculate_decimal_year_float():
     result = calculate_decimal_year(years)
     np.testing.assert_array_equal(result, years)
 
+def test_calculate_decimal_year_int():
+    """Test decimal year calculation with integer decimal-year inputs."""
+    years = np.array([2024, 2025])
+    result = calculate_decimal_year(years)
+    np.testing.assert_array_equal(result, years.astype(float))
+
+def test_calculate_decimal_year_non_leap_year():
+    """Non-leap years must divide by 365, not a fixed 366."""
+    dates = np.array([
+        datetime(2023, 1, 1),
+        datetime(2023, 7, 2, 12, 0, 0),
+        datetime(2023, 12, 31, 23, 59, 59),
+    ])
+
+    result = calculate_decimal_year(dates)
+
+    assert result[0] == pytest.approx(2023.0, abs=1e-6)
+    assert result[1] == pytest.approx(2023.5, abs=1e-3)
+    assert result[2] == pytest.approx(2024.0, abs=1e-4)
+
+def test_calculate_decimal_year_datetime64():
+    """numpy.datetime64 arrays (e.g. from xarray coordinates) must be supported."""
+    dt64 = np.array(['2023-01-01T00:00:00', '2023-07-02T12:00:00'], dtype='datetime64[ns]')
+    result = calculate_decimal_year(dt64)
+
+    assert result[0] == pytest.approx(2023.0, abs=1e-6)
+    assert result[1] == pytest.approx(2023.5, abs=1e-3)
+
+def test_calculate_decimal_year_pandas_timestamp():
+    """pandas Timestamps (e.g. object arrays from xr.DataArray.values) must be supported."""
+    import pandas as pd
+    timestamps = np.array(list(pd.to_datetime(['2023-01-01 00:00:45'])), dtype=object)
+    result = calculate_decimal_year(timestamps)
+
+    # 45 s into the year ≈ 1.4e-6 decimal year
+    assert result[0] == pytest.approx(2023.0, abs=1e-5)
+
+def test_calculate_decimal_year_2d_shape_preserved():
+    """Output shape must match a multi-dimensional input array."""
+    dates = np.array([
+        [datetime(2014, 1, 1), datetime(2014, 12, 9, 8, 45, 0)],
+        [datetime(2014, 1, 1), datetime(2014, 12, 9, 8, 45, 0)],
+    ])
+    result = calculate_decimal_year(dates)
+    assert result.shape == dates.shape
+
 def test_adjust_arctic_latitude():
     """Test Arctic latitude adjustment."""
     lat = np.array([75.0, 80.0, 60.0])
