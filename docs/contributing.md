@@ -1,9 +1,9 @@
-## How to contribute ?
+# Contributing
 
-!!! warning
-    Contributions are welcome but not yet supported! Development options will be available soon.
-
-Before this, you can raise an issue on GitHub if you encounter any problem. Please do not hesitate, I will be happy to collaborate. 
+Contributions are welcome — please feel free to open an issue or submit a
+Pull Request on [GitHub](https://github.com/RaphaelBajon/canyonbpy). If you
+encounter a problem, don't hesitate to raise an issue; I'll be happy to
+collaborate.
 
 ## Development installation
 

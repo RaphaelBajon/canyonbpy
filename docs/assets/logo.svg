@@ -1,0 +1,39 @@
+<svg viewBox="0 0 200 200" width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#0b3d5c"/>
+    </linearGradient>
+    <linearGradient id="edgeL" gradientUnits="userSpaceOnUse" x1="55" y1="22" x2="100" y2="150">
+      <stop offset="0%" stop-color="#ffc107"/>
+      <stop offset="100%" stop-color="#0b3d5c"/>
+    </linearGradient>
+    <linearGradient id="edgeM" gradientUnits="userSpaceOnUse" x1="100" y1="26" x2="100" y2="150">
+      <stop offset="0%" stop-color="#ff9800"/>
+      <stop offset="100%" stop-color="#0b3d5c"/>
+    </linearGradient>
+    <linearGradient id="edgeR" gradientUnits="userSpaceOnUse" x1="145" y1="22" x2="100" y2="150">
+      <stop offset="0%" stop-color="#ff5722"/>
+      <stop offset="100%" stop-color="#0b3d5c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- canyon walls (two peaks flanking a central valley) -->
+  <path d="M8,150 L55,22 L100,84 L145,22 L192,150 Z" fill="#25313f"/>
+
+  <!-- water filling the valley notch -->
+  <path d="M100,84 L127,150 L73,150 Z" fill="url(#water)"/>
+
+  <!-- neural-network edges converging into the canyon (input nodes -> output node) -->
+  <line x1="55" y1="22" x2="100" y2="150" stroke="url(#edgeL)" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="100" y1="26" x2="100" y2="150" stroke="url(#edgeM)" stroke-width="4.5" stroke-linecap="round"/>
+  <line x1="145" y1="22" x2="100" y2="150" stroke="url(#edgeR)" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- input nodes -->
+  <circle cx="55" cy="22" r="10" fill="#ffc107" stroke="#25313f" stroke-width="2"/>
+  <circle cx="100" cy="26" r="10" fill="#ff9800" stroke="#25313f" stroke-width="2"/>
+  <circle cx="145" cy="22" r="10" fill="#ff5722" stroke="#25313f" stroke-width="2"/>
+
+  <!-- output node -->
+  <circle cx="100" cy="150" r="12" fill="#e6f7fb" stroke="#0b3d5c" stroke-width="3"/>
+</svg>

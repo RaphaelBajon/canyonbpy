@@ -21,7 +21,7 @@
         * **Nitrate** (`NO3`) in μmol·kg<sup>−1</sup>
         * **Phosphate** (`PO4`) in μmol·kg<sup>−1</sup>
         * **Silicate** (`SiOH4`) in μmol·kg<sup>−1</sup> 
-    * Handle various input formats including datetime and decimal years
+    * Flexible time input: `datetime`, `datetime64`/`Timestamp`, date strings, or decimal years
     * Automatic Arctic latitude adjustments
     * Uncertainty estimates for all predictions
     * `numpy` integration for multi-dimensional data variables
@@ -32,54 +32,22 @@
 pip install canyonbpy
 ```
 
-For more detailed installation instructions, see the [Installation](installation.md) page.
-
-## Main commands
-
-!!! tip "`canyonbpy` main function"
-
-    `canyonb` - performs the CANYON-B calculation.
+See the [Installation](installation.md) page for details.
 
 ## Quick Start
 
-In your Python environment with `numpy`, `datetime` and `canyonbpy` libraries:
-
 ```python
-import numpy as np
 from datetime import datetime
 from canyonbpy import canyonb
 
-# Sample data
-data = {
-    'gtime': [datetime(2024, 1, 1)],
-    'lat': np.array([45.0]),
-    'lon': np.array([-20.0]),
-    'pres': np.array([100.0]),
-    'temp': np.array([15.0]),
-    'psal': np.array([35.0]),
-    'doxy': np.array([250.0])
-}
-
-# Get predictions
-results = canyonb(**data)
+results = canyonb(
+    gtime=[datetime(2024, 1, 1)], lat=[45.0], lon=[-20.0],
+    pres=[100.0], temp=[15.0], psal=[35.0], doxy=[250.0],
+)
 ```
 
-Even easier now:
+`canyonbpy` also registers a `ds.canyonb` accessor, so predictions can run
+directly on an `xr.Dataset`: `results = ds.canyonb.predict()`.
 
-```python
-import xarray as xr
-import canyonbpy  # accessor ds.canyonb is registered here
-
-# ds must contain: time, latitude, longitude, pressure, temperature, salinity, doxy
-results = ds.canyonb.predict()
-
-# CONTENT
-results_content = ds.canyonb.content()
-
-# results is an xr.Dataset with the same dims/coords as ds
-print(results["pH"])       # xr.DataArray
-print(results["pH_ci"])    # total uncertainty
-
-# Merge predictions back into the source dataset
-ds_enriched = xr.merge([ds, results])
-```
+Continue with [Getting Started](user-guide/getting-started.md) for a full
+walkthrough of both interfaces.

@@ -1,6 +1,12 @@
+# Basic Usage
+
+A single-point prediction using plain `numpy` arrays. `canyonb` returns
+plain `np.ndarray` values (not `xr.DataArray`), so results are indexed
+directly rather than via `.values`.
+
 ```python
 """
-Basic example of using CANYON_B for single point prediction.
+Basic example of using CANYON-B for single point prediction.
 """
 
 import numpy as np
@@ -29,8 +35,8 @@ def main():
     print("\nPrediction Results:")
     print("-" * 50)
     for param in ['pH', 'AT']:
-        value = results[param].values[0]
-        uncertainty = results[f'{param}_ci'].values[0]
+        value = results[param][0]
+        uncertainty = results[f'{param}_ci'][0]
         print(f"{param}: {value:.3f} ± {uncertainty:.3f}")
 
 if __name__ == "__main__":

@@ -41,7 +41,7 @@
     * `canyonb`'s return type was documented (and type-hinted) as
       `Dict[str, xr.DataArray]`; it has always returned plain
       `Dict[str, np.ndarray]`. Docstring and type hints corrected.
-    * [Input Data](../user-guide/input.md) now documents all accepted time
+    * [Input Data](user-guide/input.md) now documents all accepted time
       formats, including `datetime64`/`Timestamp` arrays and date strings.
 
 ## 0.4

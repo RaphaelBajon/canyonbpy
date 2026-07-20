@@ -26,7 +26,7 @@ The networks are trained on high-quality reference data from:
 
 ## Parameter-Specific Networks
 
-!!! info "2 Parameter-Specific Networks"
+!!! info "Two Parameter Categories"
 
     1. Carbonate System
     

@@ -1,12 +1,10 @@
-# CanyonbPy: CANYON-B Python 
+<img src="docs/assets/logo.svg" width="120" align="right" alt="canyonbpy logo">
+
+# CanyonbPy: CANYON-B Python
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.18868524.svg)](https://doi.org/10.5281/zenodo.18868524)
 
-
-A Python implementation of CANYON-B (CArbonate system and Nutrients concentration from hYdrological properties and Oxygen using Neural networks) based on [Bittig et al., 2018](https://doi.org/10.3389/fmars.2018.00328). It was developped from the MATLAB [CANYON-B v1.0](https://github.com/HCBScienceProducts/CANYON-B).
-
-## Features
-
-Calculate macronutrients and carbonate system variables using CANYON-B neural network. 
+A Python implementation of CANYON-B (CArbonate system and Nutrients concentration from hYdrological properties and Oxygen using Neural networks) based on [Bittig et al., 2018](https://doi.org/10.3389/fmars.2018.00328), ported from the MATLAB [CANYON-B v1.0](https://github.com/HCBScienceProducts/CANYON-B). Given time, position, pressure, temperature, salinity, and dissolved oxygen, it predicts carbonate system variables (AT, CT, pH, pCO2) and macronutrients (NO3, PO4, SiOH4) with full uncertainty estimates.
 
 ## Installation
 
@@ -18,12 +16,11 @@ pip install canyonbpy
 
 ## Usage
 
-Here's a simple example of how to use `canyonbpy` with `numpy`:
+A simple example with plain `numpy` arrays:
 
 ```python
 from datetime import datetime
 from canyonbpy import canyonb
-
 
 # Prepare your data
 data = {
@@ -39,13 +36,16 @@ data = {
 # Make predictions
 results = canyonb(**data)
 
-# Access results
+# Access results (plain np.ndarray)
 ph = results['pH']           # pH prediction
 ph_error = results['pH_ci']  # pH uncertainty
 ```
-And now directly with `xarray`:
+
+And directly on an `xarray.Dataset` via the built-in accessor:
 
 ```python
+import numpy as np
+from datetime import datetime
 import xarray as xr
 import canyonbpy  # accessor ds.canyonb is registered here
 

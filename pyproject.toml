@@ -34,6 +34,17 @@ dependencies = [
     "scipy>=1.6.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "black",
+    "flake8",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/RaphaelBajon/canyonbpy"
 "Bug Reports" = "https://github.com/RaphaelBajon/canyonbpy/issues"

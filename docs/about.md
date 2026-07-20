@@ -1,6 +1,6 @@
 # About
 
-`canyonbpy` is a Python package to use the Matlab CANYON-B function developed by [Bittig et al., 2018](https://doi.org/10.3389/fmars.2018.00328). It was developed from the MATLAB [CANYON-B v1.0](https://github.com/HCBScienceProducts/CANYON-B) in date of 11.09.2018, corresponding to the initial publication of the paper. It is maintained primarily by R. Bajon, currently working at the University of Hawaiʻi at Mānoa. 
+`canyonbpy` is a Python package to use the Matlab CANYON-B function developed by [Bittig et al., 2018](https://doi.org/10.3389/fmars.2018.00328). It was ported from the MATLAB [CANYON-B v1.0](https://github.com/HCBScienceProducts/CANYON-B) dated 11 September 2018, corresponding to the initial publication of the paper. It is maintained primarily by R. Bajon, currently working at the University of Hawaiʻi at Mānoa.
 
 ## Citation
 
