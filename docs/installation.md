@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-`canyonbpy` requires Python *3.8* or later and the following dependencies:
+`canyonbpy` requires Python *3.7* or later and the following dependencies:
 
 * [NumPy](https://numpy.org/doc/stable/)
 * [xarray](https://docs.xarray.dev/en/stable/)

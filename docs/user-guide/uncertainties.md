@@ -48,15 +48,3 @@ measurement_unc = results['pH_cim']
 network_unc = results['pH_cin']
 input_unc = results['pH_cii']
 ```
-
-## Parameter-Specific Considerations
-
-### Carbonate System
-- `pH`: Additional term for scale conversion
-- `pCO2`: Non-linear error propagation
-- `AT`/`CT`: Fixed measurement uncertainty terms
-
-### Nutrients
-- Relative errors increase at low concentrations
-- Additional terms for seasonal variability
-- Regional uncertainty considerations

@@ -16,17 +16,9 @@ CANYON-B (and so `canyonb`) uses a committee of neural networks for each predict
     - Uncertainty estimation
     - Robustness to outliers
 
-## Training Data
-
-The networks are trained on high-quality reference data from:
-
-1. GO-SHIP cruises
-2. Time series stations
-3. Research expeditions
-
 ## Parameter-Specific Networks
 
-!!! info "2 Parameter-Specific Networks"
+!!! info "Two Parameter Categories"
 
     1. Carbonate System
     
@@ -40,21 +32,3 @@ The networks are trained on high-quality reference data from:
         * `NO3` 
         * `PO4` 
         * `SiOH4`
-
-## Input Preprocessing
-
-!!! info "Before neural network prediction"
-
-    1. Inputs are normalized
-    2. Geographic coordinates are adjusted
-    3. Time is converted to decimal years
-    4. Arrays are reshaped as needed
-
-## Output Processing
-
-!!! info "After neural network prediction"
-
-    1. Results are denormalized
-    2. Uncertainties are calculated
-    3. Arrays are reshaped to match input
-    4. Results are packaged into dictionary

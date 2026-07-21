@@ -18,61 +18,46 @@ The function `canyonb` requires seven input parameters for prediction:
 
 !!! inputs "Array Requirements"
 
-    All input arrays must:
+    All input arrays:
 
-    * Have the same shape
-    * Be numpy arrays or convertible to numpy arrays
+    * Must be numpy arrays or convertible to numpy arrays
     * Can contain non-finite values (`np.nan`), but not recommanded for coordinates (`time`, `longitude`, `latitude`, `pressure`)
-
-```python
-import numpy as np
-from datetime import datetime
-
-# Single point
-data = {
-    'gtime': [datetime(2024, 1, 1)],
-    'lat': np.array([45.0]),
-    'lon': np.array([-20.0]),
-    'pres': np.array([100.0]),
-    'temp': np.array([15.0]),
-    'psal': np.array([35.0]),
-    'doxy': np.array([250.0])
-}
-
-# Multiple points/profile
-depths = np.array([0, 100, 200, 500])
-data_profile = {
-    'gtime': [datetime(2024, 1, 1)] * len(depths),
-    'lat': np.full_like(depths, 45.0),
-    'lon': np.full_like(depths, -20.0),
-    'pres': depths,
-    'temp': np.array([20.0, 15.0, 12.0, 8.0]),
-    'psal': np.full_like(depths, 35.0),
-    'doxy': np.array([250.0, 220.0, 200.0, 180.0])
-}
-```
 
 ### Time Format
 
-CANYON-B accepts two time formats:
+CANYON-B accepts any of the following time formats (converted internally by
+`calculate_decimal_year`):
 
-1. Python datetime objects:
+1. Python `datetime` objects:
 ```python
 from datetime import datetime
 time = [datetime(2024, 1, 1)]
 ```
 
-2. Decimal years:
+2. `numpy.datetime64` / pandas `Timestamp` arrays — e.g. directly from an
+   `xarray` time coordinate:
+```python
+time = ds["time"].values  # dtype='datetime64[ns]'
+```
+
+3. ISO date/time strings:
+```python
+time = ["2024-01-01", "2024-06-30T12:00:00"]
+```
+
+4. Decimal years:
 ```python
 time = [2024.0]  # January 1st, 2024
 ```
 
+!!! note "Leap years"
+
+    The fractional part of the decimal year is computed against the true
+    length of that calendar year (365 or 366 days), so `2024-12-31 23:59:59`
+    (a leap year) and `2023-12-31 23:59:59` (not a leap year) both resolve
+    to just under the following year, rather than being off by up to a day.
+
 ### Geographic Coordinates
-
-!!! inputs "Latitude"
-
-    * Must be between -90° and 90°
-    * Negative values for Southern hemisphere and positive values for Northern hemisphere
 
 !!! inputs "Longitude"
 
@@ -80,12 +65,3 @@ time = [2024.0]  # January 1st, 2024
 
     * -180° to 180° format (preferred)
     * 0° to 360° format
-
-
-!!! success "Arctic Region Handling"
-
-    For measurements in the Arctic basin west of the Lomonosov ridge:
-    
-    * Latitude values are automatically adjusted
-    * Adjustments account for water mass distribution
-    * No user action required

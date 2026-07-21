@@ -2,7 +2,7 @@
 
 ## Working with `xarray`
 
-`canyonbpy` registers a **`canyonb` accessor** on :class:`xarray.Dataset` objects.
+`canyonbpy` registers a **`canyonb` accessor** on `xarray.Dataset` objects.
 It is available as `ds.canyonb` as soon as `canyonbpy` is imported — no extra
 function import needed.
 
@@ -86,7 +86,7 @@ results = ds.canyonb.predict(var_map=var_map, param=["pH", "NO3"])
 
 When you need to inspect or modify the numpy arrays before running the neural
 network, use `ds.canyonb.converter()` to get the underlying
-:class:`~canyonbpy.preprocessing.DatasetToNumpy` object:
+`DatasetToNumpy` object (see the [Preprocessing API](../api/preprocessing.md)):
 
 ```python
 from canyonbpy import canyonb
@@ -114,28 +114,26 @@ results = canyonb(**data, weights_dir="/your/path/to/weights_dir/")
 results = ds.canyonb.predict(weights_dir="/your/path/to/weights_dir/")
 ```
 
-## Error Specification
+---
 
-### Global Errors
-```python
-results = canyonb(
-    **data,
-    epres=1.0,
-    etemp=0.01,
-    epsal=0.01,
-    edoxy=0.02
-)
-```
+## Using the raw `canyonb()` function directly
 
-### Variable Errors
+Everything shown above for `ds.canyonb.predict()` — parameter selection,
+custom errors, custom weights — is available identically on the raw
+`canyonb()` function, once you have plain numpy arrays instead of an
+`xr.Dataset`:
+
 ```python
+import numpy as np
+from canyonbpy import canyonb
+
+# Parameter selection
+results = canyonb(**data, param=['pH', 'AT'])
+
+# Global error specification
+results = canyonb(**data, epres=1.0, etemp=0.01, epsal=0.01, edoxy=0.02)
+
+# Per-element error (e.g. oxygen error varying by measurement)
 oxygen_errors = np.full_like(data['doxy'], 0.02)
 results = canyonb(**data, edoxy=oxygen_errors)
-```
-
-## Parameter Selection
-
-```python
-results = canyonb(**data, param=['pH', 'AT'])
-results = canyonb(**data, param=['NO3', 'PO4', 'SiOH4'])
 ```

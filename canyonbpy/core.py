@@ -1,6 +1,5 @@
 import numpy as np
-import xarray as xr
-from typing import Union, List, Dict, Optional, Tuple
+from typing import Union, List, Dict, Optional
 import PyCO2SYS as pyco2
 
 
@@ -20,8 +19,8 @@ def canyonb(
     etemp: Optional[float] = 0.005,
     epsal: Optional[float] = 0.005,
     edoxy: Optional[Union[float, np.ndarray]] = None,
-    weights_dir: str = None
-) -> Dict[str, xr.DataArray]:
+    weights_dir: Optional[str] = None
+) -> Dict[str, np.ndarray]:
     """
     CANYON-B neural network prediction for ocean parameters.
     
@@ -51,13 +50,19 @@ def canyonb(
         Salinity input error (default 0.005).
     edoxy : float or array-like, optional
         Oxygen input error (default: 1% of doxy)
-    weights_dir : str
-        Directory containing weight files
-        
+    weights_dir : str, optional
+        Directory containing custom weight files. If None, uses the
+        package's bundled weights.
+
     Returns
     -------
-    Dict[str, xr.DataArray]
-        Dictionary containing predictions and uncertainties
+    Dict[str, np.ndarray]
+        Dictionary of flat numpy arrays (reshaped to match the input
+        shape), keyed by parameter name plus ``_ci``/``_cim``/``_cin``/
+        ``_cii`` uncertainty components. See the
+        :mod:`~canyonbpy.accessor` module or
+        :class:`~canyonbpy.preprocessing.DatasetToNumpy` for packaging
+        these into an :class:`xarray.Dataset`.
     """
     # Convert inputs to numpy arrays
     arrays = [np.asarray(x) for x in (lat, lon, pres, temp, psal, doxy)]
@@ -233,15 +238,6 @@ def canyonb(
         out[f'{param_name}_cin'] = np.reshape(np.sqrt(cvalcib + cvalciw + cvalcu), shape)
         out[f'{param_name}_cii'] = np.reshape(np.sqrt(cvalcin), shape)
 
-        # TODO: should be implemented here with xarray such as 
-        #coords = {'depth': pres.reshape(shape)} 
-        #out[param_name] = xr.DataArray(
-        #    pred.reshape(shape),
-        #    coords=coords,
-        #    dims=['depth'],
-        #    name=param_name
-        #)
-        
         # pCO2
         if i == 3:
             # ipCO2 = 'DIC' / umol kg-1 -> pCO2 / uatm

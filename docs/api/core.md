@@ -19,4 +19,5 @@
 
     * NaN values in inputs should result in NaN predictions
     * Arctic latitudes are automatically adjusted
-    * Time can be provided as datetime objects or decimal years
+    * Time can be provided as `datetime`, `datetime64`/`Timestamp`, date
+      strings, or decimal years — see [Input Data](../user-guide/input.md)

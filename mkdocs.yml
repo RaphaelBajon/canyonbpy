@@ -6,6 +6,8 @@ copyright: Copyright &copy; 2025 Raphaël Bajon (MIT License)
 
 theme:
   name: material
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
   palette:
     - scheme: default
       primary: amber
